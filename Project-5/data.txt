@@ -1,0 +1,6 @@
+Maria 21 2.1
+Jeffery 20 2.0
+Douglas 22 3.1
+Matthew 16 3.1
+Kim 19 1.9
+Monique 24 2.4
