@@ -1,125 +1,114 @@
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Graphics;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+/* Arianne Arcebal, Angelo Salac
+Project 9 Part 2
+Ray Ahmadnia
+Purpose: 
+*/
 
-public class Interface {
-	public static void main(String [] args) {
-		JFrame frame = new JFrame("Project 9");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(500,500);
-		frame.setLocation(50, 50);
-		frame.setVisible(true);
-		
-		Container cPane = frame.getContentPane();
-		Graphics g = cPane.getGraphics();
-		
-		g.clearRect(0, 0, (int)cPane.getSize().getWidth(), (int)cPane.getSize().getHeight());
+package GUI;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class Interface{
+	public static void main(String[] arg){
+		JFrame frame = new JFrame("Project 9 Part 2");
 		String option;
-		
+		int width, height;
+
+		//frame
+		frame.setSize(700, 700);
+		frame.setLocation(0, 0);
+		frame.setVisible(true);
+
+		Container cPane = frame.getContentPane();
+		Graphics g      = cPane.getGraphics();
+		width           = (int)cPane.getSize().getWidth();
+		height          = (int)cPane.getSize().getHeight();
+
 		do {
+			//display menu
 			displayMenu(g);
 			option = JOptionPane.showInputDialog("Enter your option");
-			//clear the window
-			g.clearRect(0, 0, (int)cPane.getSize().getWidth(), (int)cPane.getSize().getHeight());
-			
-			if (option.equals("a")) {
-				triangles(g);
+			g.clearRect(0, 0, width, height);
+
+			//calculate shape areas
+			if(option.equals("a")) {
+				triangle(g);
 			}
-			else if (option.equals("b")) {
-				ellipses(g);
+			else if(option.equals("b")){
+				ellipse(g);
 			}
-			else if (option.equals("c")) {
-				polygons(g);
+			else if (option.equals("c")){
+				polygon(g);
 			}
 			else {
-				JOptionPane.showMessageDialog(null, "Error not an option", "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Error not a choice", "Error", JOptionPane.WARNING_MESSAGE);
 			}
-			
-			option = JOptionPane.showInputDialog("Continue(y/n)");
-			g.clearRect(0, 0, (int)cPane.getSize().getWidth(), (int)cPane.getSize().getHeight());
+
+			//ask user if they want to start again
+			option = JOptionPane.showInputDialog("Continue(y/n)?");
+			g.clearRect(0, 0, width, height);
 		} while(option.equals("y"));
+	}
+
+	static void displayMenu(Graphics g){
+		g.drawString("-------------Menu-------------", 50, 50);
+		g.drawString("a. Compute the area of triangles", 50, 70);
+		g.drawString("b. Compute the area of ellipses", 50, 90);
+		g.drawString("c. Compute the area of polygons", 50, 110);
+	}
+
+	static void triangle(Graphics g){
+		String temp;
+		int base, height;
+
+		//get triangle values
+		temp   = JOptionPane.showInputDialog("What is the length of the base?");
+		base   = Integer.parseInt(temp);
+		temp   = JOptionPane.showInputDialog("What is the length of the height?");
+		height = Integer.parseInt(temp);
+
+		//display triangle & values
+		int[] x = {50+(base/2), 50, 50+base};
+		int[] y = {50, 50+height, 50+height};
+		g.fillPolygon(x, y, 3);
+		g.drawString("Base = " + base, 50, height+70);
+		g.drawString("Height = " + height, 50, height+90);
+		g.drawString("Area = base*height/2 = " + base*height/2, 50, height+110);
+	}
+
+	static void ellipse(Graphics g){
+		String temp;
+		int minor, major;
+		float area;
+
+		//get ellipse values
+		temp  = JOptionPane.showInputDialog("What is the length of the major axis?");
+		major = Integer.parseInt(temp);
+		temp  = JOptionPane.showInputDialog("What is the length of the minor axis?");
+		minor = Integer.parseInt(temp);
+		area  = (float)(Math.PI * (major/2) * (minor/2));
+
+		//display ellipse & values
+		g.fillOval(50, 50, major, minor);
+		g.drawString("Major axis: " + major, 50, minor+80);
+		g.drawString("Minor axis: " + minor, 50, minor+100);
+		g.drawString("Area = pi*(major/2)*(minor/2) = " + area, 50, minor+120);
 		
 	}
-	
-	
-	public static void displayMenu(Graphics g) {
-		g.drawString("-------------------Menu----------------", 100, 100);
-		g.drawString("a.Compute the area of triangles", 100, 120);
-		g.drawString("b.Compute the area of an eclipse", 100, 140);
-		g.drawString("c.Compute the area of polygons", 100, 160);
-	}
-	
-	//make triangle but what do we ask from the user?
-	//do we ask side lengths or coordinates?
-	public static void triangles(Graphics g) {
-		String s1, s2, s3;
-		int side1, side2, side3;
-		
-		s1 = JOptionPane.showInputDialog("Enter the value of side 1");
-		s2 = JOptionPane.showInputDialog("Enter the value of side 2");
-		s3 = JOptionPane.showInputDialog("Enter the value of side 3");
-		
-		side1 = Integer.parseInt(s1);
-		side2 = Integer.parseInt(s2);
-		side3 = Integer.parseInt(s3);
-		
-		g.drawString("Area = 1/2 * b * h = ", 200, 200);
-	}
-	
-	public static void ellipses(Graphics g) {
-		g.drawString("Please enter ellipse info", 10, 10);
-		String major, minor;
-		
-		major = JOptionPane.showInputDialog("Enter the length of the major axis");
-		minor = JOptionPane.showInputDialog("Enter the length of the minor axis");
-		
-		//solve for the area
-		int maj, min;
-		maj = Integer.parseInt(major);
-		min = Integer.parseInt(minor);
-		
-		double area;
-		
-		area = Math.PI * (maj/2) * (min/2);
-		//display everything
-		int x = 100, y = 100;
-		g.setColor(Color.BLACK);
-		g.fillOval(x, y, maj, min);
-		
-		String a = String.valueOf(area);
-		//display text
-		g.drawString("Major axis = ", 100, y + 50);
-		g.drawString(major, 170, y + 50);
-		g.drawString("Minor axis = ", 100, y + 70);
-		g.drawString(minor, 170, 170);
-		g.drawString("Area = Math.PI * (major/2) * (minor/2) = ", 100, 190);
-		g.drawString(a, 320, 190);
-	}
-	
-	//draw a polygon...but how do you find area given only coordinates? do use distance formula?
-	// do we make up coordinates or ask for side lengths?
-	public static void polygons(Graphics g) {
-		String width, height;
-		
-		g.drawString("Enter the info of the polgon", 10, 10);
-		width = JOptionPane.showInputDialog("Enter the length of the width");
-		height = JOptionPane.showInputDialog("Enter the length of the height");
+
+	static void polygon(Graphics g){
+		//pre-defined polygon
+		int [] x = {10, 60, 100, 150};
+		int [] y = {200, 60, 70, 100};
 		
 		g.setColor(Color.blue);
-		g.fillRect(100, 100, Integer.parseInt(width), Integer.parseInt(height));
-		g.drawString("Width = ", 100, 250);
-		g.drawString(width, 150, 250);
-		g.drawString("Height = ", 100, 270);
-		g.drawString(height, 150, 270);
-		g.drawString("Area = b * h = ", 100, 290);
+		g.fillPolygon(x, y, x.length);
 		
-		int area = Integer.parseInt(width) * Integer.parseInt(height);
-		
-		String a = String.valueOf(area);
-		
-		g.drawString(a, 170, 290);
+		double area;
+		area = 0.5 * ((600 - 1200) + (1300 - 6000) + (10000 - 10500) + (30000 - 10000));
+		g.drawString("x coordinates = {10, 60, 100, 150}", 10, y[0] + 50);
+		g.drawString("y coordinates = {200, 60, 70, 100}", 10, y[0] + 70);
+		g.drawString("Area = " + area, 10, y[0] + 90);
 	}
 }
-
