@@ -138,7 +138,7 @@ public class Calculator extends Applet implements ActionListener{
 		else if (e.getSource() == factBtn) {
 			n = txtWin.getText().trim();
 			n1 = Integer.parseInt(n);
-			txtWin.setText(Integer.toString(factorial(n1)));
+			txtWin.setText(n + "!" + " = " + Integer.toString(factorial(n1)));
 		}
 		else if (e.getSource() == eqBtn) {
 			n = txtWin.getText().trim();
