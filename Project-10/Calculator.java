@@ -28,7 +28,7 @@ public class Calculator extends Applet implements ActionListener{
 	TextField
 		txtWin = new TextField();
 	
-	String n = " ", n1st, n2nd;
+	String n = " ", n1st, n2nd, operation;
 	int n1, n2;
 	
 	public void init() {
@@ -106,11 +106,39 @@ public class Calculator extends Applet implements ActionListener{
 		{ n+= "9"; txtWin.setText(n);}
 		else if (e.getSource() == zeroBtn)
 		{ n+= "0"; txtWin.setText(n);}
-		else if (e.getSource() == addBtn) {
+		
+		else if(e.getSource() == subBtn) {
+			operation = "-";
 			n = txtWin.getText().trim();
 			n1 = Integer.parseInt(n);
 			n = " ";
 			txtWin.setText(" ");
+		}
+		else if (e.getSource() == addBtn) {
+			operation = "+";
+			n = txtWin.getText().trim();
+			n1 = Integer.parseInt(n);
+			n = " ";
+			txtWin.setText(" ");
+		}
+		else if (e.getSource() == multBtn) {
+			operation = "*";
+			n = txtWin.getText().trim();
+			n1 = Integer.parseInt(n);
+			n = " ";
+			txtWin.setText(" ");
+		}
+		else if (e.getSource() == divBtn) {
+			operation = "/";
+			n = txtWin.getText().trim();
+			n1 = Integer.parseInt(n);
+			n = " ";
+			txtWin.setText(" ");
+		}
+		else if (e.getSource() == factBtn) {
+			n = txtWin.getText().trim();
+			n1 = Integer.parseInt(n);
+			txtWin.setText(Integer.toString(factorial(n1)));
 		}
 		else if (e.getSource() == eqBtn) {
 			n = txtWin.getText().trim();
@@ -119,13 +147,45 @@ public class Calculator extends Applet implements ActionListener{
 			n1st = Integer.toString(n1);
 			n2nd = Integer.toString(n2);
 			
-			txtWin.setText(n1st + "+" + n2nd + "=" + Integer.toString(n1 + n2));
+			if (operation.equals("+")) {
+				txtWin.setText(n1st + " + " + n2nd + " = " + Integer.toString(n1 + n2));
+			}
+			else if (operation.equals("-")) {
+				txtWin.setText(n1st + " - " + n2nd + " = " + Integer.toString(n1 - n2));
+			}
+			else if(operation.equals("*")) {
+				txtWin.setText(n1st + " * " + n2nd + " = " + Integer.toString(n1 * n2));
+			}
+			else if (operation.equals("/")) {
+				txtWin.setText(n1st + " / " + n2nd + " = " + Integer.toString(n1 / n2));
+			}
+		}
+		else if (e.getSource() == signBtn) {
+			n = txtWin.getText().trim();
+			if (n.charAt(0) == '-') {
+				
+				txtWin.setText(n.substring(1, n.length()));
+			}
+			else {
+				txtWin.setText("-" + n);
+			}
 		}
 		else if (e.getSource() == clearBtn){
 			txtWin.setText(" ");
 			n = " ";
-			//txtWin.requestFocus(true);
 		}
 		
+	}
+	
+	public int factorial(int n) {
+		if (n == 0) {
+			return 1;
+		}
+		else if (n == 1) {
+			return 1;
+		}
+		else {
+			return factorial(n - 1) * n;
+		}
 	}
 }
