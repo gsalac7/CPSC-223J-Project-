@@ -37,7 +37,8 @@ public class Macys extends Applet implements ActionListener, ItemListener {
 	
 	public void init() {
 		setLayout(null);
-		img = getImage(getDocumentBase(), "f1.jpg");
+		resize(1000, 500);
+		
 		
 		//set labels		
 		title.setFont(f);
@@ -52,7 +53,7 @@ public class Macys extends Applet implements ActionListener, ItemListener {
 		report.setBounds(800, 300, 300, 30);	add(report);
 		//set list
 		String[] shoes = {"Winter shoes", "Sandals", "Boots", "Sneakers", "Calf boots", "Alaskan boots", "Lucky Brand"};
-		String[] prices = {"$100.25", "$75.99", "$55.50", "$23.99", "$69.99", "$85.50", "$220.90"};
+		double[] prices = {100.25, 75.99, 55.50, 23.99, 69.99, 85.50, 220.90};
 		for (int i = 0; i < shoes.length; i++) {
 			shoeList.add(shoes[i]);
 		}
@@ -76,21 +77,17 @@ public class Macys extends Applet implements ActionListener, ItemListener {
 		
 		//set pictures - trouble setting pictures
 		
-		
+		//img = getImage(getDocumentBase(), "Macys Images/pexels-photo.jpg");
 		
 		//action listeners
 		chooseBtn.addActionListener(this);
 		returnBtn.addActionListener(this);
 		issueBtn.addActionListener(this);
+		shoeList.addItemListener(this);
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		if (shoeList.getSelectedItem().equals("Winter shoes")) {
-			reportTxt.setText("Hello");
-			img = getImage(getDocumentBase(), "f1.jpg");
-			repaint();
-		}
-		// TODO Auto-generated method stub
+		double bill;
 		if (e.getSource() == chooseBtn && red.getState() == true) {
 			String item = shoeList.getSelectedItem();
 			cartTxt.append(item + "\t" + "Red\n");
@@ -103,11 +100,16 @@ public class Macys extends Applet implements ActionListener, ItemListener {
 			String item = shoeList.getSelectedItem();
 			cartTxt.append(item + "\t" + "Brown\n");
 		}
-		
+		if (e.getSource() == returnBtn) {
+			cartTxt.setText("");
+		}
 		if (e.getSource() == issueBtn) {
+			
 			String items = cartTxt.getText().trim();
+			String[] token = items.split("        $");
+			
 			reportTxt.setText(items);
-			reportTxt.append("\nTotal Bill");
+			reportTxt.append("\nTotal Bill: ");
 		}
 		
 	}
@@ -115,14 +117,14 @@ public class Macys extends Applet implements ActionListener, ItemListener {
 	
 	
 	public void paint(Graphics g) {
-		g.drawImage(img, 400, 200, 100, 100, this);
+		g.drawImage(img, 400, 200, 200, 170, this);
 	}
 
 	public void itemStateChanged(ItemEvent e) {
 		if (e.getSource() == shoeList) {
 			if (shoeList.getSelectedItem().equals("Winter shoes")) {
 				reportTxt.setText("Hello");
-				img = getImage(getDocumentBase(), "f1.jpg");
+				img = getImage(getDocumentBase(), "Macys Images/pexels-photo.jpg");
 				repaint();
 			}
 		}

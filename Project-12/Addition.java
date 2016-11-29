@@ -9,18 +9,13 @@ public class Addition extends Applet implements ActionListener{
 	int month = c.get(Calendar.MONTH);
 	int year = c.get(Calendar.YEAR);
 	
-	
-	
-	String date = Integer.toString(month) + "/" + Integer.toString(day) + "/" + Integer.toString(year);
-	
-	
-	
 	Label
 		title = new Label("Practicing Addition"),
 		questions = new Label("Select the number of questions: "),
-		dateLbl = new Label("Today's date: " + date),
 		messageLbl = new Label("A Message from the Institution"),
 		reportLbl = new Label("Report");
+	Label problem = new Label(" ");
+	Label correct = new Label(" ");
 	Button
 		startBtn = new Button("Click to start"),
 		nextBtn = new Button("Press for the next question");
@@ -47,16 +42,21 @@ public class Addition extends Applet implements ActionListener{
 	
 	public void init() {
 		setLayout(null);
+		month += 1;
+		String date = Integer.toString(month) + "/" + Integer.toString(day) + "/" + Integer.toString(year);
 		
 		resize(700, 500);
 		
 		Font f = new Font("Ariel", Font.BOLD, 17);
 		
+		Label dateLbl = new Label("Today's date: " + date);
 		title.setFont(f);
 		title.setBounds(250, 10, 200, 30);	add(title);
 		
 		dateLbl.setBounds(20, 100, 500, 30);	add(dateLbl);
-		questions.setBounds(20, 140, 300, 30);	add(questions);
+		questions.setBounds(20, 140, 200, 30);	add(questions);
+		five.setBounds(230, 150, 30, 10);	add(five);
+		ten.setBounds(280, 150, 30, 10);	add(ten);
 		
 		startBtn.setBounds(40, 180, 100, 40);	add(startBtn);
 		
@@ -80,26 +80,32 @@ public class Addition extends Applet implements ActionListener{
 
 
 	public void actionPerformed(ActionEvent e) {
-		Label problem = problem = new Label("Question No. " + Integer.toString(counter) + "    " + Integer.toString(x) + " + " + Integer.toString(y) + " = ?");
-		if (e.getSource() == startBtn) {			
+		
+		problem.setText("Question No. " + Integer.toString(counter) + "    " + Integer.toString(x) + " + " + Integer.toString(y) + " = ?");
+				
+		if (e.getSource() == startBtn) {
 			problem.setBounds(20, 230, 150, 30);	add(problem);
 		}
-		else if (e.getSource() == nextBtn) {
-			Label temp = problem;
-			problem.setVisible(false);
+			
+		else if (e.getSource() == nextBtn) {		
+			 
 			System.out.println(sum);
 			System.out.println(answer.getText());
 			if (answer.getText().trim().equals(Integer.toString(sum))) {
-				Label correct = new Label("CORRECT");
+				correct.setText("CORRECT");
 				correct.setBounds(260, 220, 100, 30);	add(correct);
 			}
 			else {
-				Label wrong = new Label("WRONG");
-				wrong.setBounds(260, 220, 100, 30);	add(wrong);
+				correct.setText("WRONG");
+				correct.setBounds(260, 220, 100, 30);	add(correct);
 			}
+			
+			x = (int)(Math.random() * 10);
+			y = (int)(Math.random() * 10);
+			
+			sum = x + y;
+			counter++;
+			problem.setText("Question No. " + Integer.toString(counter) + "    " + Integer.toString(x) + " + " + Integer.toString(y) + " = ?");
 		}
-	}
-	
-	
-	
+	}	
 }
