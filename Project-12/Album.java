@@ -7,7 +7,7 @@ public class Album extends Applet implements ActionListener, AdjustmentListener 
 	String []pics = {"Album Images/f1.jpg", "Album Images/f2.jpg", "Album Images/f3.jpg", "Album Images/f4.jpg"};
 	int width = 50, height = 50;
 	Scrollbar sb = new Scrollbar(0, 10, 10, 0, 210);
-	
+	int counter = 0;
 	Image img;
 	
 	Button
@@ -49,55 +49,52 @@ public class Album extends Applet implements ActionListener, AdjustmentListener 
 	
 	
 	public void actionPerformed(ActionEvent e) {
-		int counter;
-		if (e.getSource() == next) {
-			counter = 0;
-			if (counter == 0) {
-				counter += 1;
-				img = getImage(getDocumentBase(), pics[1]);
-				repaint();
-			}
-			else if (counter == 1) {
-				counter += 1;
-				img = getImage(getDocumentBase(), pics[2]);
-				repaint();
-			}
-			else if (counter == 2) {
-				counter += 1;
-				img = getImage(getDocumentBase(), pics[3]);
-				repaint();
-			}
-			else  {
-				counter = 0;
-				img = getImage(getDocumentBase(), pics[0]);
-				repaint();
-			}
+		if (e.getSource() == next && counter == 0) {
+			counter += 1;
+			System.out.print(counter);
+			img = getImage(getDocumentBase(), pics[1]);
+			repaint();
 		}
-		if (e.getSource() == back) {
+		else if (e.getSource() == next && counter == 1) {
+			counter += 1;
+			System.out.print(counter);
+			img = getImage(getDocumentBase(), pics[2]);
+			repaint();
+		}
+		else if (e.getSource() == next && counter == 2) {
+			counter += 1;
+			System.out.print(counter);
+			img = getImage(getDocumentBase(), pics[3]);
+			repaint();
+		}
+		else  if (e.getSource() == next && counter == 3){
 			counter = 0;
-			if (counter == 0) {
-				counter += 1;
-				img = getImage(getDocumentBase(), pics[1]);
-				repaint();
-			}
-			else if (counter == 1) {
-				counter += 1;
-				img = getImage(getDocumentBase(), pics[2]);
-				repaint();
-			}
-			else if (counter == 2) {
-				counter += 1;
-				img = getImage(getDocumentBase(), pics[3]);
-				repaint();
-			}
-			else  {
-				counter = 0;
-				img = getImage(getDocumentBase(), pics[0]);
-				repaint();
-			}
+			System.out.print(counter);
+			img = getImage(getDocumentBase(), pics[0]);
+			repaint();
+		}
+		else if (e.getSource() == back && counter == 3) {
+			counter--;
+			img = getImage(getDocumentBase(), pics[3]);
+			repaint();
+		}
+		else if (e.getSource() == back && counter == 2) {
+			counter--;
+			img = getImage(getDocumentBase(), pics[2]);
+			repaint();
+		}
+		else if (e.getSource() == back && counter == 1) {
+			counter--;
+			img = getImage(getDocumentBase(), pics[1]);
+			repaint();
+		}
+		else if (e.getSource() == back && counter == 0) {
+			counter = 3;
+			img = getImage(getDocumentBase(), pics[0]);
+			repaint();
 		}
 		
-		if (e.getSource() == show) {
+		else if (e.getSource() == show) {
 			if (img == getImage(getDocumentBase(), pics[0])) {
 				description.setText("This is Mt. Rushmore located in North Dakota");
 			}
