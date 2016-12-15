@@ -1,34 +1,38 @@
 /* Angelo Salac
  * Ray Ahmadnia
- * Final Exam part 3
+ * Final Exam, Part 3
  * 12/15/16
- * Purpose: Create the Tower of Hanoi
+ * Purpose: Tower of Hanoi animation.
  */
 
-/* I am almost confident that this should work.
- * Except for some reason i need to find a way to fix
- * the topDisk Bug.
- */
-
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
 import java.applet.*;
 
-public class TowerOfHanoi extends Applet implements ActionListener{
+public class TowerOfHanoi extends Applet implements ActionListener, Runnable{
+	
+	/* The way I built this program relied on the repaint function instantly 
+	 * repainting the frame on each iteration of the recursive function.
+	 * The x and y positions were calculated by the number of the peg, and 
+	 * the height of the pegs respectively.  The new thread T, was made
+	 * for multithreading purposes... The first thread would create the 
+	 * interface and hold the paint function, but the T thread would call the function and
+	 * would be able to repaint during the iteration.  Without the T thread, calling 
+	 * towerOfHanoi function wouldn't work. 
+	 */
+	
+	
+	//this thread will be used to call the function, towerOfHanoi
+	Thread T; 
 	
 	//initial variables for interface
 	Button start = new Button("Press to Start");
 	Label enter = new Label("Enter the number of disks(<= 7)");
 	TextField number = new TextField();
 	
-	int begin;
-	
 	Disk [] disks = new Disk[7]; //an array of disks to represent the disks, up to a max of seven
 	Stack [] height = new Stack[3]; //stack used to determine the height of the pegs
+	
 	int xPos = 10;
 	int yPos = 10;
 	int diskWidthAdjust = 20;
@@ -38,28 +42,21 @@ public class TowerOfHanoi extends Applet implements ActionListener{
 	int numDisks; //used only to get the number of disks
 	
 	int topDisk = 0; //this will be used to find the top Disk number
-	
-	
-	
+
 	public void init() {
 		//initialize applet with labels and buttons
 		setLayout(null);
-		resize(610, 250);
+		resize(640, 250);
 		
 		//we assign the variables for each disk in its initial state, all in the first peg.
 		for (int i = 0; i < 7; i++) {
 			disks[i] = new Disk(10 + i * xPos, 175 - i * yPos, 130 - i * diskWidthAdjust, 10); 
 		}
 		
-		
 		height[0] = new Stack(0); //first peg
 		height[1] = new Stack(0); //second peg
 		height[2] = new Stack(0); //third peg
-		
-		
-		begin = 0;
-		
-		
+			
 		enter.setBounds(10, 10, 180, 20);	add(enter);
 		number.setBounds(200, 10, 25, 20);	add(number);
 		start.setBounds(260, 10, 80, 20);	add(start);
@@ -67,31 +64,35 @@ public class TowerOfHanoi extends Applet implements ActionListener{
 		start.addActionListener(this);
 	}
 	
+	//new thread
+	public void run() {
+		repaint();
+		towerOfHanoi(numDisks, 0, 2, 1);
+		stop();
+	}
+	
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == start) {
+			//I recreate a new thread every single time, so I dont
+			//have to restart the program to enter a different number
+			T = new Thread(this); //create new thread
+			for (int i = 0; i < 7; i++) {
+				disks[i] = new Disk(10 + i * xPos, 175 - i * yPos, 130 - i * diskWidthAdjust, 10); 
+			}
 			num = number.getText().trim();	
 			numDisks = Integer.parseInt(num);
-			
-			repaint();
-			
-			//start the tower of hanoi function catch block used because of the delay function
-			begin = 1;
-			
-			
-			try {				
-				height[0].changeHeight(numDisks);
-				begin = 2;
-				towerOfHanoi(numDisks, 0, 2, 1);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
+									
+			height[0].changeHeight(numDisks); //first peg
+			height[1] = new Stack(0); //second peg
+			height[2] = new Stack(0); //third peg
+			//start the new thread...start run function
+			T.start();	
 		}
 	}
 	
 	
 	//initialize the pegs; first thing called when applet starts
-	public void paint	(Graphics g) {
-	
+	public void paint(Graphics g) {
 		g.setColor(Color.BLUE);
 		g.fillRect(20, 190, 560, 10); //base
 		g.fillRect(70, 60, 10, 150); //first peg
@@ -100,26 +101,13 @@ public class TowerOfHanoi extends Applet implements ActionListener{
 		
 		//create the painting based on the amount of disks, starting with the biggest disk.	
 		//when this is repainted, it will draw the new disks in different pegs with different coordinates
-		draw(g);
-	}	
-	
-	//function used to draw the pegs based on the x and y positions,
-	//x and y positions change according to the moveTo function.
-	public void draw(Graphics g) {
 		g.setColor(Color.RED);
 		for (int i = 0; i < numDisks; i++) {
 			g.fillRect(disks[i].xPos, disks[i].yPos, disks[i].width, 10);
-			
 		}
 	}
 	
-	public void update(Graphics g) {
-		paint(g);
-	}
-	//redraw the frame with the new x and y positions
-	
-	
-	public void towerOfHanoi(int N, int from, int to, int temp) throws InterruptedException {
+	public void towerOfHanoi(int N, int from, int to, int temp) {
 		if (N == 1) {
 			moveTo(from, to, N);
 		}
@@ -131,11 +119,12 @@ public class TowerOfHanoi extends Applet implements ActionListener{
 	}
 	
 	//change move to function move disks from 1st stack to the 3rd stack
-	public void moveTo(int from, int to, int diskNum) throws InterruptedException {		
+	public void moveTo(int from, int to, int diskNum) {		
 		System.out.println(from + "->" + to);
 			
 		//adjust the disk number to match the indexing of the way I 
-		//used the disk number.
+		//used the disk number, as an index of arrays starting from
+		//the bottom up at 0.
 		if (numDisks == 1) {
 			if (diskNum == 1) {	diskNum = 0;}
 		}
@@ -180,7 +169,7 @@ public class TowerOfHanoi extends Applet implements ActionListener{
 		}	
 		
 		
-		//diskNum += height[from].height;
+		/*These outputs are just for debugging purposes*/
 		System.out.println("Disk moving is disk # " + diskNum);
 		topDisk = diskNum;
 		
@@ -190,145 +179,147 @@ public class TowerOfHanoi extends Applet implements ActionListener{
 		System.out.println("Height of Peg 1: " + height[0].height);
 		System.out.println("Height of Peg 2: " + height[1].height);
 		System.out.println("Height of Peg 3: " + height[2].height);
-		/* we can do this the hard way and calculate the xPos and yPos
-		 * We might just have to create the disk1 - disk7 each with its own widths, every disk 
-		 * has the same height. Every disk has its own xPos and yPos.
-		 * when we do that, we will then need to calculate the appropriate xPos for each..
-		 * but how do we calculate the yPos????? 
-		 * yPos is calculated based on the height of the pegs...
-		 * So now how do we calculate what the top disk number is?
-		 *  
-		*/	
+		
+		/*Im not sure why, but the repaint function ends, to be here
+		 * otherwise the thread may get to overloaded...
+		 * Thread.sleep() is the function used to delay in milliseconds.
+		 */
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		repaint();
+		
+		/* Okay, so I made individual functions for each disk's movement from
+		 * peg i to peg j... these if statements just calls which function for
+		 * the disk to do by what peg i and peg j is. And the y positions for 
+		 * the disk to return to is dependent on the height of peg j. 
+		 */
 		
 		if (from == 0 && to == 1) { //adjust the new xPos
 			disks[topDisk].from0to1(); //change xPos
 			if (height[1].height == 0) { //adjusts the new yPos
-				disks[topDisk].yPos = 175;
+				disks[topDisk].yPos = 185;
 			} else if (height[1].height == 1) {
-				disks[topDisk].yPos = 165;
+				disks[topDisk].yPos = 175;
 			} else if (height[1].height == 2) {
-				disks[topDisk].yPos = 155;
+				disks[topDisk].yPos = 165;
 			} else if (height[1].height == 3) {
-				disks[topDisk].yPos = 145;
+				disks[topDisk].yPos = 155;
 			} else if (height[1].height == 4) {
-				disks[topDisk].yPos = 135;
+				disks[topDisk].yPos = 145;
 			} else if (height[1].height == 5) {
-				disks[topDisk].yPos = 125;
+				disks[topDisk].yPos = 135;
 			} else if (height[1].height == 6) {
-				disks[topDisk].yPos = 115;
+				disks[topDisk].yPos = 125;
 			} else if (height[1].height == 7) {
-				disks[topDisk].yPos = 105;
+				disks[topDisk].yPos = 115;
 			}
 		} else if (from == 1 && to == 2) {
 			disks[topDisk].from1to2();
 			if (height[2].height == 0) { //adjusts the new yPos
-				disks[topDisk].yPos = 175;
+				disks[topDisk].yPos = 185;
 			} else if (height[2].height == 1) {
-				disks[topDisk].yPos = 165;
+				disks[topDisk].yPos = 175;
 			} else if (height[2].height == 2) {
-				disks[topDisk].yPos = 155;
+				disks[topDisk].yPos = 165;
 			} else if (height[2].height == 3) {
-				disks[topDisk].yPos = 145;
+				disks[topDisk].yPos = 155;
 			} else if (height[2].height == 4) {
-				disks[topDisk].yPos = 135;
+				disks[topDisk].yPos = 145;
 			} else if (height[2].height == 5) {
-				disks[topDisk].yPos = 125;
+				disks[topDisk].yPos = 135;
 			} else if (height[2].height == 6) {
-				disks[topDisk].yPos = 115;
+				disks[topDisk].yPos = 125;
 			} else if (height[2].height == 7) {
-				disks[topDisk].yPos = 105;
+				disks[topDisk].yPos = 115;
 			}
 		} else if (from == 0 && to == 2) {
 			disks[topDisk].from0to2();
 			if (height[2].height == 0) { //adjusts the new yPos
-				disks[topDisk].yPos = 175;
+				disks[topDisk].yPos = 185;
 			} else if (height[2].height == 1) {
-				disks[topDisk].yPos = 165;
+				disks[topDisk].yPos = 175;
 			} else if (height[2].height == 2) {
-				disks[topDisk].yPos = 155;
+				disks[topDisk].yPos = 165;
 			} else if (height[2].height == 3) {
-				disks[topDisk].yPos = 145;
+				disks[topDisk].yPos = 155;
 			} else if (height[2].height == 4) {
-				disks[topDisk].yPos = 135;
+				disks[topDisk].yPos = 145;
 			} else if (height[2].height == 5) {
-				disks[topDisk].yPos = 125;
+				disks[topDisk].yPos = 135;
 			} else if (height[2].height == 6) {
-				disks[topDisk].yPos = 115;
+				disks[topDisk].yPos = 125;
 			} else if (height[2].height == 7) {
-				disks[topDisk].yPos = 105;
+				disks[topDisk].yPos = 115;
 			}
 		} else if (from == 1 && to == 0) {
 			disks[topDisk].from1to0();
 			if (height[0].height == 0) { //adjusts the new yPos
-				disks[topDisk].yPos = 175;
+				disks[topDisk].yPos = 185;
 			} else if (height[0].height == 1) {
-				disks[topDisk].yPos = 165;
+				disks[topDisk].yPos = 175;
 			} else if (height[0].height == 2) {
-				disks[topDisk].yPos = 155;
+				disks[topDisk].yPos = 165;
 			} else if (height[0].height == 3) {
-				disks[topDisk].yPos = 145;
+				disks[topDisk].yPos = 155;
 			} else if (height[0].height == 4) {
-				disks[topDisk].yPos = 135;
+				disks[topDisk].yPos = 145;
 			} else if (height[0].height == 5) {
-				disks[topDisk].yPos = 125;
+				disks[topDisk].yPos = 135;
 			} else if (height[0].height == 6) {
-				disks[topDisk].yPos = 115;
+				disks[topDisk].yPos = 125;
 			} else if (height[0].height == 7) {
-				disks[topDisk].yPos = 105;
+				disks[topDisk].yPos = 115;
 			}
 		} else if (from == 2 && to == 0) {
 			disks[topDisk].from2to0();
 			if (height[0].height == 0) { //adjusts the new yPos
-				disks[topDisk].yPos = 175;
+				disks[topDisk].yPos = 185;
 			} else if (height[0].height == 1) {
-				disks[topDisk].yPos = 165;
+				disks[topDisk].yPos = 175;
 			} else if (height[0].height == 2) {
-				disks[topDisk].yPos = 155;
+				disks[topDisk].yPos = 165;
 			} else if (height[0].height == 3) {
-				disks[topDisk].yPos = 145;
+				disks[topDisk].yPos = 155;
 			} else if (height[0].height == 4) {
-				disks[topDisk].yPos = 135;
+				disks[topDisk].yPos = 145;
 			} else if (height[0].height == 5) {
-				disks[topDisk].yPos = 125;
+				disks[topDisk].yPos = 135;
 			} else if (height[0].height == 6) {
-				disks[topDisk].yPos = 115;
+				disks[topDisk].yPos = 125;
 			} else if (height[0].height == 7) {
-				disks[topDisk].yPos = 105;
+				disks[topDisk].yPos = 115;
 			}
 		} else if (from == 2 && to == 1) {
 			disks[topDisk].from2to1();
 			if (height[1].height == 0) { //adjusts the new yPos
-				disks[topDisk].yPos = 175;
+				disks[topDisk].yPos = 185;
 			} else if (height[1].height == 1) {
-				disks[topDisk].yPos = 165;
+				disks[topDisk].yPos = 175;
 			} else if (height[1].height == 2) {
-				disks[topDisk].yPos = 155;
+				disks[topDisk].yPos = 165;
 			} else if (height[1].height == 3) {
-				disks[topDisk].yPos = 145;
+				disks[topDisk].yPos = 155;
 			} else if (height[1].height == 4) {
-				disks[topDisk].yPos = 135;
+				disks[topDisk].yPos = 145;
 			} else if (height[1].height == 5) {
-				disks[topDisk].yPos = 125;
+				disks[topDisk].yPos = 135;
 			} else if (height[1].height == 6) {
-				disks[topDisk].yPos = 115;
+				disks[topDisk].yPos = 125;
 			} else if (height[1].height == 7) {
-				disks[topDisk].yPos = 105;
+				disks[topDisk].yPos = 115;
 			}
-		}
-		Thread.sleep(700);
-		repaint();
+		}		
 	}
 }
 
 
 class Disk {
 	int width, height, xPos, yPos;
-	
-	Disk() {
-		width = 100;
-		height = 10;
-	}
-	
+
 	Disk(int xPos, int yPos, int width, int height) {
 		this.xPos = xPos;
 		this.yPos = yPos;
@@ -359,3 +350,42 @@ class Stack {
 	void changeHeight(int height) {	this.height = height;}
 	void setTopDisk(int topDisk) {this.topDiskNum = topDisk;}
 }
+
+/*
+Output in Console:
+0->2
+Disk moving is disk # 2
+Height of Peg 1: 2
+Height of Peg 2: 0
+Height of Peg 3: 1
+0->1
+Disk moving is disk # 1
+Height of Peg 1: 1
+Height of Peg 2: 1
+Height of Peg 3: 1
+2->1
+Disk moving is disk # 2
+Height of Peg 1: 1
+Height of Peg 2: 2
+Height of Peg 3: 0
+0->2
+Disk moving is disk # 0
+Height of Peg 1: 0
+Height of Peg 2: 2
+Height of Peg 3: 1
+1->0
+Disk moving is disk # 2
+Height of Peg 1: 1
+Height of Peg 2: 1
+Height of Peg 3: 1
+1->2
+Disk moving is disk # 1
+Height of Peg 1: 1
+Height of Peg 2: 0
+Height of Peg 3: 2
+0->2
+Disk moving is disk # 2
+Height of Peg 1: 0
+Height of Peg 2: 0
+Height of Peg 3: 3
+*/
